@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ysp.dao.UserInfoDao">
+    <select id="findUserInfoByUserId" resultType="org.ysp.entity.UserInfo">
+		SELECT
+			 user_id  id            ,
+             username username        ,
+             sex      sex        ,
+             birthday birthday       ,
+             phone    phone    ,
+             work_status workStatus      ,
+             begin_work_date beginWorkDate   ,
+             wechat wechat     ,
+             email email
+		FROM
+            user_info
+        WHERE
+            user_id = #{id}
+	</select>
+
+    <select id="getAllWorkStatus" resultType="org.ysp.entity.WorkStatus">
+        SELECT
+          id,
+          status workStatus
+        FROM
+          work_status
+    </select>
+
+
+
+
+
+</mapper>

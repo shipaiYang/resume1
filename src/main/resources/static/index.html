@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>我的简历</title>
+    <script src="vue-2.5.22/vue.js"></script>
+    <script src="element-ui-2.5.2/index.js"></script>
+    <script src="js/axios.min.js"></script>
+    <link href="element-ui-2.5.2/css/index.css" type="text/css" rel="stylesheet">
+    <link href="css/resume-index.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <!-- <el-container> -->
+            <!-- header -->
+            <!-- <el-header style="background-color: black; height: 50px"> -->
+<!-- 
+            </el-header> -->
+            <!-- main -->
+            <!-- <el-main style="background-color: #F0F0F0; height: 500px"> -->
+                <!-- 个人信息 -->
+                <el-row type="flex" justify="center">
+                    <el-col style="width:60%; background-color: white">
+                        <el-card class="box-card" shadow="hover" v-show="!editStatus.userInfoEditStatus">
+                            <div slot="header" class="clearfix">
+                                <span>杨史派</span>
+                                <el-button class="el-icon-edit" style="float: right; padding: 3px 0" type="text"
+                                    @click="editResume('userInfo')">编辑
+                                </el-button>
+                            </div>
+                            <el-row>
+                                <el-col :span="12">
+                                    <div>
+                                        <span class="el-icon-suitcase-1">{{userInfo.workExperience}}</span>
+                                        <el-divider direction="vertical"></el-divider>
+                                        <span class="el-icon-phone-outline">{{userInfo.phone}}</span>
+                                        <el-divider direction="vertical"></el-divider>
+                                        <span class="el-icon-user">{{currentJobStatus}}</span>
+                                        <div style="margin-top: 10px"></div>
+                                        <span class="el-icon-chat-dot-round">{{userInfo.wechatNum}}</span>
+                                        <el-divider direction="vertical"></el-divider>
+                                        <span class="el-icon-message">{{userInfo.email}}</span>
+                                    </div>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <div style="padding-left: 150px">
+                                            <el-upload 
+                                            class="avatar-uploader"
+                                            action="../user/saveUserPhoto.do?method=Pictureupload" :show-file-list="false"
+                                            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                        </el-upload>
+
+                                    </div>
+                                    
+                                </el-col>
+                            </el-row>
+                        </el-card>
+                        <!-- 编辑的表单 -->
+                        <el-form ref="userInfo" :model="userInfo" label-width="80px" label-position="top"
+                            v-show="editStatus.userInfoEditStatus" class="box-form">
+
+                            <el-row :gutter="20">
+                                <el-col :span=12>
+                                    <el-form-item label="姓名">
+                                        <el-input v-model="userInfo.username"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="性别">
+                                        <el-radio-group v-model="userInfo.sex">
+                                            <el-radio label="男"></el-radio>
+                                            <el-radio label="女"></el-radio>
+                                        </el-radio-group>
+                                    </el-form-item>
+                                    <el-form-item label="生日">
+                                        <el-input v-model="userInfo.birthday"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="电话">
+                                        <el-input v-model="userInfo.phone"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span=12>
+                                    <el-form-item label="当前求职状态">
+                                        <el-select v-model="currentJobStatus" placeholder="请选择活动区域">
+                                            <el-option v-for="item in jobStatusList" :key="item.id"
+                                                :label="item.workStatus" :value="item.id"></el-option>
+
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item label="开始工作时间">
+                                        <el-col :span="11">
+                                            <el-date-picker type="month" placeholder="选择日期"
+                                                v-model="userInfo.startWorkTime" style="width: 100%;">
+                                            </el-date-picker>
+                                        </el-col>
+                                    </el-form-item>
+                                    <el-form-item label="微信号（选填）">
+                                        <el-input v-model="userInfo.wechatNum"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="邮箱（选填）">
+                                        <el-input v-model="userInfo.email"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+                            <el-form-item>
+                                <el-button type="primary" @click="save(userInfo)">保存</el-button>
+                                <el-button @click="cancelSave('userInfo')">取消
+                                </el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+
+
+                </el-row>
+
+                <el-row  type="flex" justify="center">
+                    <el-col style="width:60%; background-color: white">
+                            <el-card class="box-card">
+                                    <div slot="header" class="clearfix">
+                                        <span>个人优势</span>
+                                        <el-button class="el-icon-edit" style="float: right; padding: 3px 0" type="text">编辑
+                                        </el-button>
+                                    </div>
+            
+                                    <div v-for="o in 4" :key="o" class="text item">
+                                        {{'列表内容 ' + o }}
+                                    </div>
+                                </el-card>
+                    </el-col>
+                    
+                </el-row>
+                <el-row type="flex" justify="center">
+                    <el-col style="width:60%; background-color: white">
+                            <el-card class="box-card">
+                                    <div slot="header" class="clearfix">
+                                        <span>期望职位</span>
+                                        <el-button class="el-icon-edit" style="float: right; padding: 3px 0" type="text">编辑
+                                        </el-button>
+                                    </div>
+            
+                                    <div v-for="o in 4" :key="o" class="text item">
+                                        {{'列表内容 ' + o }}
+                                    </div>
+                                </el-card>
+                    </el-col>
+                    
+                </el-row>
+                <el-row type="flex" justify="center">
+                        <el-col style="width:60%; background-color: white">
+                                <el-card class="box-card">
+                                        <div slot="header" class="clearfix">
+                                            <span>工作经历</span>
+                                            <el-button class="el-icon-edit" style="float: right; padding: 3px 0" type="text">编辑
+                                            </el-button>
+                                        </div>
+                
+                                        <div v-for="o in 4" :key="o" class="text item">
+                                            {{'列表内容 ' + o }}
+                                        </div>
+                                    </el-card>
+                        </el-col>
+                        
+                    </el-row>
+                <el-row type="flex" justify="center">
+                        <el-col style="width:60%; background-color: white">
+                                <el-card class="box-card">
+                                        <div slot="header" class="clearfix">
+                                            <span>项目经历</span>
+                                            <el-button class="el-icon-edit" style="float: right; padding: 3px 0" type="text">编辑
+                                            </el-button>
+                                        </div>
+                
+                                        <div v-for="o in 4" :key="o" class="text item">
+                                            {{'列表内容 ' + o }}
+                                        </div>
+                                    </el-card>
+                        </el-col>
+                        
+                    </el-row>
+
+            <!-- </el-main> -->
+            <!-- footer -->
+            <!-- <el-footer style="background-color: #8c939d; height: 80px">
+                <el-row>
+
+                </el-row>
+            </el-footer> -->
+        <!-- </el-container> -->
+    </div>
+</body>
+<script>
+    
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            userInfo: {
+                username: '杨史派',
+                sex: '男',
+                birthday: '',
+                phone: '',
+                currentJobStatus:'',
+                startWorkTime: '',
+                wechatNum: '',
+                email: '',
+                workExperience:''
+            },
+            jobStatusList: [],
+            currentJobStatus: "",
+            editStatus: {
+                userInfoEditStatus: false
+            },
+            imageUrl: ''
+        },
+        created: function () {
+
+            this.initAll();
+
+        },
+        beforeMount: function () {
+            var myDate = new Date();
+            console.log(myDate.toLocaleDateString());
+
+
+
+
+
+        },
+        mounted: function () {
+
+
+
+        },
+        computed: {
+            workExperience:function () {
+                
+            }
+
+        },
+        methods: {
+            editResume(title){
+                switch(title){
+                    case 'userInfo':
+                    this.editStatus.userInfoEditStatus=true;
+                    break;
+
+
+                }
+            },
+            cancelSave(title){
+                switch(title){
+                    case 'userInfo':
+                    this.editStatus.userInfoEditStatus=false;
+                    break;
+                }
+                this.initAll();
+            },
+            save(obj){
+                axios({
+                    header:{'Content-type':'application/json'},
+                    url:'../user/saveUserInfo.do',
+                    method:'post',
+                    data:this.userInfo
+                });
+            },
+            initAll: function () {
+                console.log(1111);
+                axios.get("../user/getUserInfo.do").then((response) => {
+                    var obj = response.data;
+                    this.userInfo.username = obj.username;
+                    this.userInfo.birthday = obj.birthday;
+                    this.userInfo.phone = obj.phone;
+                    this.userInfo.email = obj.email;
+                    this.userInfo.wechatNum = obj.wechatNum;
+                    this.userInfo.currentJobStatus = obj.currentJobStatus;
+                    this.userInfo.sex = obj.sex == 'M' ? '男' : '女';
+                    this.userInfo.startWorkTime=obj.startWorkTime;
+                    this.userInfo.workExperience = obj.workExperience+"年工作经验";
+                    axios.get("../user/getAllWorkStatus.do").then((response) => {
+                        var obj = response.data;
+                        this.jobStatusList = obj;
+                        this.getCurrentJobStatus();
+                        console.log("getAllWorkStatus finish!");
+                    }).catch((error) => {
+                        this.$message.error(error);
+                    });
+                    console.log("getUserInfo finish!");
+                }).catch((error) => {
+                    this.$message.error(error);
+                });
+
+
+
+            },
+            getCurrentJobStatus: function () {
+
+                console.log(2222);
+                this.jobStatusList.forEach(element => {
+
+
+                    if (element.id == this.userInfo.currentJobStatus) {
+                        this.currentJobStatus = element.workStatus;
+                    }
+                });
+
+                console.log("getCurrentJobStatus finish");
+
+
+            },
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = URL.createObjectURL(file.raw);
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            }
+        }
+
+    });
+
+    function datedifference(sDate1, sDate2) {    //sDate1和sDate2是2006-12-18格式
+        var dateSpan,
+            tempDate,
+            iDays;
+        sDate1 = Date.parse(sDate1);
+        sDate2 = Date.parse(sDate2);
+        dateSpan = sDate2 - sDate1;
+        dateSpan = Math.abs(dateSpan);
+        iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+        return iDays
+    };
+</script>
+
+</html>
